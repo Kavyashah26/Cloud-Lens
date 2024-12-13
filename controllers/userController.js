@@ -23,7 +23,7 @@ exports.loginUser = async (req, res) => {
     }
 
     // Generate JWT token
-    const token = jwt.sign({ userId: user._id,roleArn:user.roleArn,email:user.email }, process.env.JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign({ userId: user._id,roleArn:user.roleArn,email:user.email,username:user.username }, process.env.JWT_SECRET, { expiresIn: '1h' });
     res.json({ token });
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -42,3 +42,39 @@ exports.getUser = async (req, res) => {
     res.status(400).json({ error: error.message });
   }
 };
+
+exports.updateUser= async (req,res)=>{
+  console.log("In update");
+  
+  try {
+    // Get user from the JWT token (extracted in verifyToken middleware)
+    const userId = req.user.userId;
+
+    // Get updated profile data from the request body
+    const updatedProfile = req.body;
+
+    // Find the user in the database and update the profile
+    const user = await User.findById(userId);
+    console.log("abc");
+    
+    if (!user) {
+      console.log("no user");
+      
+      return res.status(404).json({ message: 'User not found' });
+    }
+    
+    console.log("abc2");
+    // Update the user's profile with the new data
+    Object.assign(user, updatedProfile);
+    
+    console.log("abc3");
+    // Save the updated user data
+    await user.save();
+
+    // Respond with updated user data
+    res.status(200).json(user);
+  } catch (err) {
+    console.error('Error updating profile:', err);
+    res.status(500).json({ message: 'Server error. Failed to update profile.' });
+  }
+}

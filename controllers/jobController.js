@@ -1,3 +1,4 @@
+const { json } = require('body-parser');
 const Job = require('../models/Job');
 const { scheduleJob, cancelJob } = require('../services/jobService');
 
@@ -11,7 +12,9 @@ exports.createJob = async (req, res) => {
     // Add userId and roleArn to jobData
     jobData.userId = userId;
     jobData.roleArn = roleArn;
-    console.log("jobData", jobData);
+    console.log("jobData", (jobData));
+    console.log("jobData details", (jobData.details));
+    // json(jobData)
     
     // Create and save the job
     const job = new Job(jobData);
